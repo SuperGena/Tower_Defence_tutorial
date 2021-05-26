@@ -22,6 +22,12 @@ public class GameTile : MonoBehaviour
 
     private GameTileContent _content;
 
+    public GameTile NextTileOnPath => _nextOnPath;
+
+    public Vector3 ExitPoint { get; private set; }
+
+    public Direction PathDirection { get; private set; }
+
     public GameTileContent Content
     {
         get => _content;
@@ -59,9 +65,10 @@ public class GameTile : MonoBehaviour
     {
         _distance = 0;
         _nextOnPath = null;
+        ExitPoint = transform.localPosition;
     }
 
-    private GameTile GrowPathTo(GameTile neigbor)
+    private GameTile GrowPathTo(GameTile neigbor, Direction direction)
     {
         if (!HasPath || neigbor == null || neigbor.HasPath)
         {
@@ -70,13 +77,15 @@ public class GameTile : MonoBehaviour
 
         neigbor._distance = _distance + 1;
         neigbor._nextOnPath = this;
+        neigbor.ExitPoint = (neigbor.transform.localPosition + transform.localPosition) * 0.5f;
+        neigbor.PathDirection = direction;
         return neigbor.Content.Type != GameTileContentType.Wall ? neigbor : null;
     }
 
-    public GameTile GrowPathNorth() => GrowPathTo(_north);
-    public GameTile GrowPathEast() => GrowPathTo(_east);
-    public GameTile GrowPathSouth() => GrowPathTo(_south);
-    public GameTile GrowPathWest() => GrowPathTo(_west);
+    public GameTile GrowPathNorth() => GrowPathTo(_north, Direction.North);
+    public GameTile GrowPathEast() => GrowPathTo(_east, Direction.East);
+    public GameTile GrowPathSouth() => GrowPathTo(_south, Direction.South);
+    public GameTile GrowPathWest() => GrowPathTo(_west, Direction.West);
 
     public void ShowPath()
     {
